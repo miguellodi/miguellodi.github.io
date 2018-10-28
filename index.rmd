@@ -109,7 +109,7 @@ Grafico3 <- Grafico1 %>%
 A fim de aprimorar a gestão dos convênios entre o Fundo Nacional Antidrogas - FUNAD e os diversos tipos de convenientes, a Secretaria Nacional Antidrogas - SENAD desenvolveu um relatório de acompanhamento, chamando "ListaConvênioGrupo". O principal objetivo deste estudo é verificar se existe alguma consistência na relação entre o total de convênios e os valores de repasse por unidade da federação.
 
 ## Contexto (Justificativa):
-
+O FNAD recebe recursos tanto do Orçamento Nacional(maior parte dos recursos), quanto de emendas parlamentares impositivas, estas sem qualquer gerência por parte da SENAD. Todos oss projeto, independentes da origem dos recursos, devem estar de acordo com o Plano Nacional Antidrogas.
 
 
 ## Método:
@@ -162,16 +162,20 @@ library(ggplot2)
 
 ```
 
-## Total de repasse por UF - Período 2008-2017
+## Repasse por UF - Período 2008-2017
 ```{r}
 ggplot(data=Grafico1, aes(x=UF_PROPONENTE,
                                y=soma,
                           fill = `%Repasse`))+
        geom_bar(stat="identity")+
-  ggtitle("Total de convênios por ano e UF")+
-     xlab("UF") + ylab("Soma valor de repasse")+ 
-     theme(legend.text = element_text(face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1, size =8))+
-  scale_fill_gradient(low="#FFFFF2", high="#FF0000")
+       xlab("UF") + ylab("Soma valor de repasse")+
+     theme(legend.text = element_text(face = "bold"), axis.text.x =          element_text(angle = 90, hjust = 1, size =8))+
+  scale_y_continuous(labels = NULL)+
+       scale_fill_continuous(labels=scales::percent)+
+       guides(fill=guide_legend(title="% de Repasse")) +
+       labs(color="%Contrato")+
+       ylab("Percentual de Repasse") +
+       theme(axis.text.y = element_text(size=5))
 ```
 ```
 
@@ -198,7 +202,5 @@ ggplot(data=Grafico1, aes(x=UF_PROPONENTE,
 ```
 
 ## Conclusões:
-Quantidade de contratos:
-A maior parte do contratos está situado no estado de SP, seguido de PR, MG e RJ.
-
-SP, RS e RJ.
+A quantidade de contratos em maior parte do contratos está situado no estado de SP, seguido de PR, MG e RJ. O repasse, por sua vez, está concentrado em SP, RJ e RS. 
+No último gráfico, onde comparo os percentuais de contrato e repasse frente ao total nacional, fica demonstrado que mesmo com uma grande quantidade de convênios, o estado de SP possui um recebe ainda maior. O mesmo acontece nos estados do RJ e RS, mesmo que em menor quantidade.O estado de MG, que possui um total de contratos maior que o estado do RS, teve um repasse menor. Desta forma podemos conluir que historicamente o valor dos convênios dos estados de SP, RJ e RS são proporcionalmente maior que os demais.
