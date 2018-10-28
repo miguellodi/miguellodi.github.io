@@ -105,19 +105,19 @@ Grafico3 <- Grafico1 %>%
 
 ```
 
-## Introdução:
-
-A fim de aprimorar a gestão dos convênios entre o Fundo Nacional Antidrogas - FUNAD e os diversos tipos de convenientes, a Secretaria Nacional Antidrogas - SENAD desenvolveu um relatório de acompanhamento, chamando ListaConvênioGrupo. Tal instrumento é o resultado da junção de diversas bases do SICONV: siconv_convenio, siconv_desembolso, siconv_proposta e siconv_pagamento. Alem destas uma outra tabela é utilizada, DAP, com as informações da Diretoria de Articulação e Projetos - DAP. Para isso foi utilizado o comando "left_join". Para que o comando fosse realizado com sucesso foi necessário alterar o tipo de algumas variáveis.
-
-## Objetivo:
+## Introdução/Objetivo:
+A fim de aprimorar a gestão dos convênios entre o Fundo Nacional Antidrogas - FUNAD e os diversos tipos de convenientes, a Secretaria Nacional Antidrogas - SENAD desenvolveu um relatório de acompanhamento, chamando "ListaConvênioGrupo". O principal objetivo deste estudo é verificar se existe alguma consistência na relação entre o total de convênios e os valores de repasse por unidade da federação.
 
 ## Contexto (Justificativa):
-
-## Método (como foi a coleta de dados):
-
+O FNAD recebe recursos tanto do Orçamento Nacional(maior parte dos recursos), quanto de emendas parlamentares impositivas, estas sem qualquer gerência por parte da SENAD. Todos oss projeto, independentes da origem dos recursos, devem estar de acordo com o Plano Nacional Antidrogas.
 
 
-## Convênio por UF - Período 2008 - 2018
+## Método:
+O relatório "ListaConvênioGrupo" é o resultado da junção de diversas bases do SICONV: siconv_convenio, siconv_desembolso, siconv_proposta e siconv_pagamento. Além destas, uma outra tabela é utilizada, DAP, com as informações da Diretoria de Articulação e Projetos - DAP. Para isso foi utilizado o comando "left_join". 
+Porém, para evitar distorções, foram excluídos os convênios de 2018, pois no Siconv constam propostas ainda em análise que podem não ser efetivadas e com isso gerar um total irrealista.
+
+
+## Convênio por UF - Período 2008 - 2017
 
 ```{r }
 
@@ -132,41 +132,19 @@ library(ggplot2)
 
 ```
 
-## Convênio por UF e Ano - Período 2008-2018
+## Convênio por UF e Ano - Período 2008-2017
 ```{r}
    theme_set(theme_bw(base_size = 18))
    ggplot(ListaConvenioGrupo,aes(as.factor(UF_PROPONENTE),fill=as.factor(ANO)))+
      geom_bar()+
      ggtitle("Total de convênios por ano e UF")+
-     xlab("UF") + ylab("Contagem")+theme(legend.position="bottom")+ 
-     theme(legend.text = element_text(face = "bold")) + 
+     xlab("UF") + ylab("Contagem")+ 
+     theme(legend.text = element_text(face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1, size =8)) + 
      guides(fill=guide_legend(title="Ano"))+
-       theme_bw()+
-     theme(axis.text.x = element_text(angle = 90, 
-                                      hjust = 1, size =8))
+     theme()
 ```
 
-
-
-## Histograma Valor do Repasse, normal e densidade (LOG)
-
-```{r }
-#Histograma Valor do Repasse
-media <- mean(log(ListaConvenioGrupo$VL_REPASSE_CONV))
-SD <- sd(log(ListaConvenioGrupo$VL_REPASSE_CONV))
-  ggplot(data=ListaConvenioGrupo, aes(x=log(VL_REPASSE_CONV))) + 
-  geom_histogram(aes(y = ..density..), binwidth=0.3, col="black", 
-                 fill = "snow") +
-  geom_density(aes(y=..density..), color="darkblue")+
-  stat_function(fun=dnorm, args=list(mean=media, sd=SD), color="red")+
-  scale_x_discrete(breaks=NULL)+
-  geom_rug() + 
-  xlab("Densidade do Valor do Repasse") + 
-  ylab("Densidade") + 
-  ggtitle("Histograma Valor do Repasse")
-```
-
-## Repasse, Intervalo de confiança e tendência linear
+## Intervalo de confiança e regressão linear do valor de repasse:
 ```{r}
    RepasseANO <- ListaConvenioGrupo %>%
      select(UF_PROPONENTE, VL_REPASSE_CONV, ANO) %>% 
@@ -184,7 +162,24 @@ SD <- sd(log(ListaConvenioGrupo$VL_REPASSE_CONV))
 
 ```
 
-## Comparação entre os % de repasse e qtd de convênios
+## Repasse por UF - Período 2008-2017
+```{r}
+ggplot(data=Grafico1, aes(x=UF_PROPONENTE,
+                               y=soma,
+                          fill = `%Repasse`))+
+       geom_bar(stat="identity")+
+       xlab("UF") + ylab("Soma valor de repasse")+
+     theme(legend.text = element_text(face = "bold"), axis.text.x =          element_text(angle = 90, hjust = 1, size =8))+
+  scale_y_continuous(labels = NULL)+
+       scale_fill_continuous(labels=scales::percent)+
+       guides(fill=guide_legend(title="% de Repasse")) +
+       labs(color="%Contrato")+
+       ylab("Percentual de Repasse") +
+       theme(axis.text.y = element_text(size=5))
+```
+```
+
+## Comparação entre os % de repasse e qtd de convênios:
 ```{r echo=FALSE}
 
       ggplot(data=Grafico3, aes(x=UF_PROPONENTE,
@@ -204,9 +199,8 @@ SD <- sd(log(ListaConvenioGrupo$VL_REPASSE_CONV))
        ylab("Percentual de Repasse/Qtd Contratos") + xlab("UF")+
        theme(axis.text.y = element_text(size=7))
    
-  
 ```
 
 ## Conclusões:
-
-TESTE
+A quantidade de contratos em maior parte do contratos está situado no estado de SP, seguido de PR, MG e RJ. O repasse, por sua vez, está concentrado em SP, RJ e RS. 
+No último gráfico, onde comparo os percentuais de contrato e repasse frente ao total nacional, fica demonstrado que mesmo com uma grande quantidade de convênios, o estado de SP possui um recebe ainda maior. O mesmo acontece nos estados do RJ e RS, mesmo que em menor quantidade.O estado de MG, que possui um total de contratos maior que o estado do RS, teve um repasse menor. Desta forma podemos conluir que historicamente o valor dos convênios dos estados de SP, RJ e RS são proporcionalmente maior que os demais.
